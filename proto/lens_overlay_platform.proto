@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package lens;
+
+enum Platform {
+  PLATFORM_UNSPECIFIED = 0;
+  PLATFORM_WEB = 3;
+  PLATFORM_LENS_OVERLAY = 6;
+}

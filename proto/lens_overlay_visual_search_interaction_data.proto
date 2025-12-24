@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package lens;
+
+import "lens_overlay_geometry.proto";
+import "lens_overlay_interaction_request_metadata.proto";
+import "lens_overlay_visual_search_interaction_log_data.proto";
+
+message LensOverlayVisualSearchInteractionData {
+  LensOverlayInteractionRequestMetadata.Type interaction_type = 1;
+  ZoomedCrop zoomed_crop = 7;
+  string object_id = 3;
+  LensOverlayVisualSearchInteractionLogData log_data = 5;
+}

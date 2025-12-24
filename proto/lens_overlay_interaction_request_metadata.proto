@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package lens;
+
+import "lens_overlay_geometry.proto";
+import "lens_overlay_text_query.proto";
+
+message LensOverlayInteractionRequestMetadata {
+  enum Type {
+    UNKNOWN = 0;
+    TAP = 1;
+    REGION = 2;
+    TEXT_SELECTION = 3;
+    REGION_SEARCH = 4;
+    OBJECT_FULFILLMENT = 5;
+    CONTEXTUAL_SEARCH_QUERY = 9;
+    PDF_QUERY = 10;
+    WEBPAGE_QUERY = 11;
+  }
+
+  message SelectionMetadata {
+    message Point {
+      float x = 1;
+      float y = 2;
+    }
+
+    message Region {
+      CenterRotatedBox region = 1;
+    }
+
+    message Object {
+      string object_id = 1;
+      Geometry geometry = 2;
+    }
+
+    oneof selection {
+      Point point = 1;
+      Region region = 2;
+      Object object = 3;
+    }
+  }
+
+  message QueryMetadata {
+    TextQuery text_query = 2;
+  }
+
+  Type type = 1;
+  SelectionMetadata selection_metadata = 2;
+  QueryMetadata query_metadata = 4;
+}

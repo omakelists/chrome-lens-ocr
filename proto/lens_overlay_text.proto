@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package lens;
+
+import "lens_overlay_geometry.proto";
+
+enum WritingDirection {
+  DEFAULT_WRITING_DIRECTION_LEFT_TO_RIGHT = 0;
+  WRITING_DIRECTION_RIGHT_TO_LEFT = 1;
+  WRITING_DIRECTION_TOP_TO_BOTTOM = 2;
+}
+
+enum Alignment {
+  DEFAULT_LEFT_ALIGNED = 0;
+  RIGHT_ALIGNED = 1;
+  CENTER_ALIGNED = 2;
+}
+
+message Text {
+  TextLayout text_layout = 1;
+  string content_language = 2;
+}
+
+message TextLayout {
+  message Word {
+    enum Type {
+      TEXT = 0;
+      FORMULA = 1;
+    }
+
+    message FormulaMetadata {
+      string latex = 1;
+    }
+
+    TextEntityIdentifier id = 1;
+    string plain_text = 2;
+    optional string text_separator = 3;
+    Geometry geometry = 4;
+    Type type = 5;
+    FormulaMetadata formula_metadata = 6;
+  }
+
+  message Line {
+    repeated Word words = 1;
+    Geometry geometry = 2;
+  }
+
+  message Paragraph {
+    TextEntityIdentifier id = 1;
+    repeated Line lines = 2;
+    Geometry geometry = 3;
+    WritingDirection writing_direction = 4;
+    string content_language = 5;
+  }
+
+  repeated Paragraph paragraphs = 1;
+}
+
+message TextEntityIdentifier {
+  int64 id = 1;
+}

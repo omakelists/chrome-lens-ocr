@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package lens;
+
+message ClientImage {
+  bytes image_content = 1;
+}

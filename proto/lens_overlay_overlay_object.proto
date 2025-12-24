@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package lens;
+
+import "lens_overlay_geometry.proto";
+
+message OverlayObject {
+  message RenderingMetadata {
+    enum RenderType {
+      DEFAULT = 0;
+      GLEAM = 1;
+    }
+
+    RenderType render_type = 1;
+  }
+
+  message InteractionProperties {
+    bool select_on_tap = 1;
+  }
+
+  string id = 1;
+  Geometry geometry = 2;
+  RenderingMetadata rendering_metadata = 8;
+  InteractionProperties interaction_properties = 4;
+  bool is_fulfilled = 9;
+}

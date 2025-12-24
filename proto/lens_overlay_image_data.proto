@@ -1,0 +1,21 @@
+
+syntax = "proto3";
+
+package lens;
+
+import "lens_overlay_geometry.proto";
+
+message ImageData {
+  ImagePayload payload = 1;
+  ImageMetadata image_metadata = 3;
+  repeated Geometry significant_regions = 4;
+}
+
+message ImagePayload {
+  bytes image_bytes = 1;
+}
+
+message ImageMetadata {
+  int32 width = 1;
+  int32 height = 2;
+}

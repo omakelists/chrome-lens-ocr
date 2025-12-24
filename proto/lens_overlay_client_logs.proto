@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package lens;
+
+import "lens_overlay_phase_latencies_metadata.proto";
+
+message LensOverlayClientLogs {
+  enum LensOverlayEntryPoint {
+    UNKNOWN_ENTRY_POINT = 0;
+    APP_MENU = 1;
+    PAGE_CONTEXT_MENU = 2;
+    IMAGE_CONTEXT_MENU = 3;
+    OMNIBOX_BUTTON = 4;
+    TOOLBAR_BUTTON = 5;
+    FIND_IN_PAGE = 6;
+  }
+
+  LensOverlayPhaseLatenciesMetadata phase_latencies_metadata = 1;
+  optional LensOverlayEntryPoint lens_overlay_entry_point = 2;
+  optional uint64 paella_id = 3;
+  optional bool metrics_collection_disabled = 5;
+}

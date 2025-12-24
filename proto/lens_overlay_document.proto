@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package lens;
+
+message LensOverlayDocument {
+  repeated Page pages = 1;
+}
+
+message Page {
+  int32 page_number = 1;
+  repeated string text_segments = 4;
+}

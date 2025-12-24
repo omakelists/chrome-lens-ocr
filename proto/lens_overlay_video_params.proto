@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package lens;
+
+import "lens_overlay_video_context_input_params.proto";
+
+message LensOverlayVideoParams {
+  LensOverlayVideoContextInputParams video_context_input_params = 1;
+}

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package lens;
+
+import "lens_overlay_polygon.proto";
+
+message CenterRotatedBox {
+  float center_x = 1;
+  float center_y = 2;
+  float width = 3;
+  float height = 4;
+  float rotation_z = 5;
+  CoordinateType coordinate_type = 6;
+}
+
+message Geometry {
+  CenterRotatedBox bounding_box = 1;
+  repeated Polygon segmentation_polygon = 5;
+}
+
+message ZoomedCrop {
+  CenterRotatedBox crop = 1;
+  int32 parent_width = 2;
+  int32 parent_height = 3;
+  float zoom = 4;
+}

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package lens;
+
+import "lens_overlay_knowledge_intent_query.proto";
+
+message Query {
+  FunctionCall intent_query = 56249026;
+}

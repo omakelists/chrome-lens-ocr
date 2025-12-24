@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package lens;
+
+import "lens_overlay_geometry.proto";
+import "lens_overlay_payload.proto";
+
+message ImageCrop {
+  string crop_id = 1;
+  ClientImage image = 2;
+  ZoomedCrop zoomed_crop = 3;
+}

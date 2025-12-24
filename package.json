@@ -9,7 +9,9 @@
   ],
   "scripts": {
     "start": "node sharex.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "proto:generate": "grpc_tools_node_protoc -I ./proto --js_out=import_style=commonjs,binary:./src/utils/proto_generated ./proto/*.proto",
+    "postinstall": "npm run proto:generate"
   },
   "bin": "./cli.js",
   "type": "module",
@@ -43,6 +45,7 @@
     "google-protobuf":"^3.21.4"
   },
   "devDependencies": {
-    "clipboardy": "^4.0.0"
+    "clipboardy": "^4.0.0",
+    "grpc-tools": "^1.13.1"
   }
 }

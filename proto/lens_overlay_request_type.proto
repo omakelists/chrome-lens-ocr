@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package lens;
+
+enum RequestType {
+  REQUEST_TYPE_DEFAULT = 0;
+  REQUEST_TYPE_PDF = 1;
+  REQUEST_TYPE_EARLY_PARTIAL_PDF = 3;
+  REQUEST_TYPE_WEBPAGE = 2;
+}

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package lens;
+
+message LensOverlayRoutingInfo {
+  string server_address = 1;
+  string cell_address = 3;
+  string blade_target = 2;
+}

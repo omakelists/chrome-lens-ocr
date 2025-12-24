@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package lens;
+
+import "lens_overlay_knowledge_query.proto";
+
+message MessageSet {
+  Query message_set_extension = 41401449;
+}

@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package lens;
+
+message MathSolverQuery {
+  string math_input_equation = 3;
+}

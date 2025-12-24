@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package lens;
+
+message TextQuery {
+  string query = 1;
+  bool is_primary = 2;
+}

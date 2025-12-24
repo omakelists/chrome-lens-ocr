@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package lens;
+
+import "lens_overlay_translate_stickiness_signals.proto";
+
+message FunctionCall {
+  string name = 1;
+  repeated Argument argument = 2;
+  FunctionCallSignals signals = 4;
+}
+
+message FunctionCallSignals {
+  TranslateStickinessSignals translate_stickiness_signals = 311378150;
+}
+
+message Argument {
+  string name = 1;
+  ArgumentValue value = 2;
+}
+
+message ArgumentValue {
+  oneof value {
+    SimpleValue simple_value = 3;
+  }
+}
+
+message SimpleValue {
+  oneof value {
+    string string_value = 1;
+  }
+}

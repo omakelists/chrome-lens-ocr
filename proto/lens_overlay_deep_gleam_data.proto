@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package lens;
+
+import "lens_overlay_text.proto";
+
+message DeepGleamData {
+  oneof rendering_oneof {
+    TranslationData translation = 10;
+  }
+
+  repeated string visual_object_id = 11;
+}
+
+message TranslationData {
+  message Status {
+    enum Code {
+      UNKNOWN = 0;
+      SUCCESS = 1;
+      SERVER_ERROR = 2;
+      UNSUPPORTED_LANGUAGE_PAIR = 3;
+      SAME_LANGUAGE = 4;
+      UNKNOWN_SOURCE_LANGUAGE = 5;
+      INVALID_REQUEST = 6;
+      DEADLINE_EXCEEDED = 7;
+      EMPTY_TRANSLATION = 8;
+      NO_OP_TRANSLATION = 9;
+    }
+
+    Code code = 1;
+  }
+
+  message TextStyle {
+    uint32 text_color = 1;
+    uint32 background_primary_color = 2;
+  }
+
+  message BackgroundImageData {
+    enum FileFormat {
+      UNKNOWN = 0;
+      RAW_BYTES_RGBA = 1;
+      PNG_RGBA = 2;
+      WEBP_RGBA = 3;
+      JPEG_RGB_PNG_MASK = 4;
+    }
+
+    bytes background_image = 1;
+    int32 image_width = 2;
+    int32 image_height = 3;
+    float vertical_padding = 4;
+    float horizontal_padding = 5;
+    FileFormat file_format = 6;
+    bytes text_mask = 7;
+  }
+
+  message Line {
+    message Word {
+      int32 start = 1;
+      int32 end = 2;
+    }
+
+    int32 start = 1;
+    int32 end = 2;
+    TextStyle style = 3;
+    repeated Word word = 5;
+    BackgroundImageData background_image_data = 9;
+  }
+
+  Status status = 1;
+  string target_language = 2;
+  string source_language = 3;
+  string translation = 4;
+  repeated Line line = 5;
+  WritingDirection writing_direction = 7;
+  Alignment alignment = 8;
+  bool justified = 9;
+}

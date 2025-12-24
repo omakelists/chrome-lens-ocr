@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package lens;
+
+message LensOverlayPhaseLatenciesMetadata {
+  enum ImageType {
+    UNKNOWN = 0;
+    JPEG = 1;
+    PNG = 2;
+    WEBP = 3;
+  }
+
+  message Phase {
+    message ImageDownscaleData {
+      int64 original_image_size = 1;
+      int64 downscaled_image_size = 2;
+    }
+
+    message ImageEncodeData {
+      ImageType original_image_type = 1;
+      int64 encoded_image_size_bytes = 2;
+    }
+
+    oneof phase_data {
+      ImageDownscaleData image_downscale_data = 3;
+      ImageEncodeData image_encode_data = 4;
+    }
+  }
+
+  repeated Phase phase = 1;
+}

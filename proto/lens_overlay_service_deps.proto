@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package lens;
+
+import "lens_overlay_client_context.proto";
+import "lens_overlay_cluster_info.proto";
+import "lens_overlay_deep_gleam_data.proto";
+import "lens_overlay_document.proto";
+import "lens_overlay_image_crop.proto";
+import "lens_overlay_image_data.proto";
+import "lens_overlay_interaction_request_metadata.proto";
+import "lens_overlay_overlay_object.proto";
+import "lens_overlay_request_id.proto";
+import "lens_overlay_request_type.proto";
+import "lens_overlay_text.proto";
+
+enum CompressionType {
+  UNCOMPRESSED = 0;
+  ZSTD = 1;
+}
+
+message LensOverlayRequestContext {
+  LensOverlayRequestId request_id = 3;
+  LensOverlayClientContext client_context = 4;
+}
+
+message ViewportRequestContext {
+  int32 pdf_page_number = 1;
+}
+
+message LensOverlayObjectsRequest {
+  LensOverlayRequestContext request_context = 1;
+  ImageData image_data = 3;
+  Payload payload = 4;
+  ViewportRequestContext viewport_request_context = 5;
+}
+
+message LensOverlayUploadChunkRequest {
+  LensOverlayRequestContext request_context = 1;
+  ChunkDebugOptions debug_options = 6;
+  int64 chunk_id = 3;
+  bytes chunk_bytes = 4;
+}
+
+message LensOverlayUploadChunkResponse {
+  ChunkDebugMetadata debug_metadata = 2;
+}
+
+message ChunkDebugOptions {
+  int64 total_chunks = 1;
+  bool query_chunks = 2;
+}
+
+message ChunkDebugMetadata {
+  repeated int64 remaining_chunks = 1;
+}
+
+message LensOverlayObjectsResponse {
+  repeated OverlayObject overlay_objects = 2;
+  Text text = 3;
+  repeated DeepGleamData deep_gleams = 4;
+  LensOverlayClusterInfo cluster_info = 7;
+}
+
+message LensOverlayInteractionRequest {
+  LensOverlayRequestContext request_context = 1;
+  LensOverlayInteractionRequestMetadata interaction_request_metadata = 2;
+  ImageCrop image_crop = 3;
+}
+
+message LensOverlayInteractionResponse {
+  string encoded_response = 3;
+  Text text = 5;
+}
+
+message Payload {
+  RequestType request_type = 6;
+  ImageData image_data = 2;
+  bytes content_data = 3;
+  string content_type = 4;
+  string page_url = 5;
+  LensOverlayDocument partial_pdf_document = 7;
+  CompressionType compression_type = 8;
+  StoredChunkOptions stored_chunk_options = 9;
+  Content content = 10;
+}
+
+message StoredChunkOptions {
+  bool read_stored_chunks = 1;
+  int64 total_stored_chunks = 2;
+}
+
+message Content {
+  string webpage_url = 1;
+  string webpage_title = 4;
+  repeated ContentData content_data = 2;
+  RequestType request_type = 3;
+}
+
+message ContentData {
+  enum ContentType {
+    CONTENT_TYPE_UNSPECIFIED = 0;
+    CONTENT_TYPE_PDF = 1;
+    CONTENT_TYPE_INNER_TEXT = 2;
+    CONTENT_TYPE_INNER_HTML = 3;
+    CONTENT_TYPE_ANNOTATED_PAGE_CONTENT = 4;
+    CONTENT_TYPE_EARLY_PARTIAL_PDF = 5;
+  }
+
+  ContentType content_type = 1;
+  bytes data = 2;
+  CompressionType compression_type = 3;
+  StoredChunkOptions stored_chunk_options = 4;
+}

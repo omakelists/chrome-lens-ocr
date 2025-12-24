@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package lens;
+
+import "lens_overlay_client_platform.proto";
+import "lens_overlay_filters.proto";
+import "lens_overlay_selection_type.proto";
+
+message LensOverlayVisualSearchInteractionLogData {
+  FilterData filter_data = 1;
+  UserSelectionData user_selection_data = 2;
+  bool is_parent_query = 3;
+  ClientPlatform client_platform = 4;
+}
+
+message FilterData {
+  LensOverlayFilterType filter_type = 1;
+}
+
+message UserSelectionData {
+  LensOverlaySelectionType selection_type = 1;
+}

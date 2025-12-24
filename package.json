@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node sharex.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "proto:generate": "grpc_tools_node_protoc -I ./proto --js_out=import_style=commonjs,binary:./src/utils/proto_generated ./proto/*.proto",
+    "proto:generate": "buf generate",
     "postinstall": "npm run proto:generate"
   },
   "bin": "./cli.js",
@@ -37,15 +37,16 @@
   },
   "homepage": "https://github.com/dimdenGD/chrome-lens-ocr#readme",
   "dependencies": {
+    "@bufbuild/protobuf": "^2.10.2",
     "file-type": "^19.0.0",
     "image-dimensions": "^2.3.0",
     "set-cookie-parser": "^2.6.0",
     "sharp": "^0.33.2",
-    "undici": "^5.28.3",
-    "google-protobuf":"^3.21.4"
+    "undici": "^5.28.3"
   },
   "devDependencies": {
-    "clipboardy": "^4.0.0",
-    "grpc-tools": "^1.13.1"
+    "@bufbuild/buf": "^1.61.0",
+    "@bufbuild/protoc-gen-es": "^2.10.2",
+    "clipboardy": "^4.0.0"
   }
 }

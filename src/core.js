@@ -1,19 +1,21 @@
 import { imageDimensionsFromData } from 'image-dimensions';
 import setCookie from 'set-cookie-parser';
+import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
 import { LENS_PROTO_ENDPOINT, LENS_API_KEY, MIME_TO_EXT, EXT_TO_MIME, SUPPORTED_MIMES } from './consts.js';
 
 import { parseCookies, sleep } from './utils.js';
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
 
-const { LensOverlayServerRequest, LensOverlayObjectsRequest, LensOverlayRequestContext, LensOverlayServerResponse, LensOverlayServerError, LensOverlayServerErrorErrorType } = require('./utils/proto_generated/lens_overlay_server_pb.cjs');
-const { LensOverlayClientContext, LocaleContext, ClientLoggingData } = require('./utils/proto_generated/lens_overlay_client_context_pb.cjs');
-const { Platform, Surface } = require('./utils/proto_generated/lens_overlay_client_platform_pb.cjs');
-const { ImageData, ImagePayload, ImageMetadata } = require('./utils/proto_generated/lens_overlay_image_data_pb.cjs');
-const { LensOverlayRequestId } = require('./utils/proto_generated/lens_overlay_request_id_pb.cjs');
-const { AppliedFilter, AppliedFilters, LensOverlayFilterType } = require('./utils/proto_generated/lens_overlay_filters_pb.cjs');
-const { Text, TextLayout, TextLayoutParagraph, TextLayoutLine, TextLayoutWord, WritingDirection, Alignment } = require('./utils/proto_generated/lens_overlay_text_pb.cjs');
-const { Geometry, CenterRotatedBox, CoordinateType } = require('./utils/proto_generated/lens_overlay_geometry_pb.cjs');
+import { LensOverlayServerRequestSchema, LensOverlayServerResponseSchema, LensOverlayServerErrorSchema, LensOverlayServerError_ErrorType } from './utils/proto_generated/lens_overlay_server_pb.js';
+import { LensOverlayObjectsRequestSchema, LensOverlayRequestContextSchema } from "./utils/proto_generated/lens_overlay_service_deps_pb.js";
+import { LensOverlayClientContextSchema, LocaleContextSchema, ClientLoggingDataSchema } from './utils/proto_generated/lens_overlay_client_context_pb.js';
+import { Platform } from "./utils/proto_generated/lens_overlay_platform_pb.js";
+import { Surface } from "./utils/proto_generated/lens_overlay_surface_pb.js";
+import { ImageDataSchema, ImagePayloadSchema, ImageMetadataSchema } from './utils/proto_generated/lens_overlay_image_data_pb.js';
+import { LensOverlayRequestIdSchema } from './utils/proto_generated/lens_overlay_request_id_pb.js';
+import { AppliedFilterSchema, AppliedFiltersSchema, LensOverlayFilterType } from './utils/proto_generated/lens_overlay_filters_pb.js';
+import { TextSchema, TextLayoutSchema, TextLayout_ParagraphSchema, TextLayout_LineSchema, TextLayout_WordSchema, WritingDirection, Alignment } from './utils/proto_generated/lens_overlay_text_pb.js';
+import { GeometrySchema, CenterRotatedBoxSchema } from './utils/proto_generated/lens_overlay_geometry_pb.js';
+import { CoordinateType } from "./utils/proto_generated/lens_overlay_polygon_pb.js";
 
 
 export class BoundingBox {
@@ -124,86 +126,97 @@ export default class LensCore {
     #createLensProtoRequest(imageBytesUint8Array, width, height) {
         const targetLanguage = this.#config.targetLanguage;
 
-        const requestId = new LensOverlayRequestId();
-        requestId.setUuid(String(Date.now()) + String(Math.floor(Math.random() * 1000000)));
-        requestId.setSequenceId(1);
-        requestId.setImageSequenceId(1);
+        const requestId = create(LensOverlayRequestIdSchema, {
+            uuid: String(Date.now()) + String(Math.floor(Math.random() * 1000000)),
+            sequenceId: 1,
+            imageSequenceId: 1
+        });
 
-        const localeContext = new LocaleContext();
-        localeContext.setLanguage(targetLanguage);
-        localeContext.setRegion(this.#config.region || 'US');
-        localeContext.setTimeZone(this.#config.timeZone || 'America/New_York');
+        const localeContext = create(LocaleContextSchema, {
+            language: targetLanguage,
+            region: this.#config.region || 'US',
+            timeZone: this.#config.timeZone || 'America/New_York'
+        });
 
-        const appliedFilter = new AppliedFilter();
-        appliedFilter.setFilterType(LensOverlayFilterType.AUTO_FILTER);
-        const clientFilters = new AppliedFilters();
-        clientFilters.addFilter(appliedFilter);
+        const appliedFilter = create(AppliedFilterSchema, {
+            filterType: LensOverlayFilterType.AUTO_FILTER
+        });
+        const clientFilters = create(AppliedFiltersSchema, {
+            filter: appliedFilter
+        });
 
-        const clientContext = new LensOverlayClientContext();
-        clientContext.setPlatform(Platform.WEB);
-        clientContext.setSurface(Surface.CHROMIUM);
-        clientContext.setLocaleContext(localeContext);
-        clientContext.setClientFilters(clientFilters);
+        const clientContext = create(LensOverlayClientContextSchema, {
+            platform: Platform.PLATFORM_WEB,
+            surface: Surface.SURFACE_CHROMIUM,
+            localeContext: localeContext,
+            clientFilters: clientFilters
+        });
 
-        const requestContext = new LensOverlayRequestContext();
-        requestContext.setRequestId(requestId);
-        requestContext.setClientContext(clientContext);
+        const requestContext = create(LensOverlayRequestContextSchema, {
+            requestId: requestId,
+            clientContext: clientContext
+        });
 
-        const imageMetadata = new ImageMetadata();
-        imageMetadata.setWidth(width);
-        imageMetadata.setHeight(height);
+        const imageMetadata = create(ImageMetadataSchema, {
+            width: width,
+            height: height
+        });
 
-        const imagePayload = new ImagePayload();
-        imagePayload.setImageBytes(imageBytesUint8Array);
+        const imagePayload = create(ImagePayloadSchema, {
+            imageBytes: imageBytesUint8Array
+        });
 
-        const imageData = new ImageData();
-        imageData.setPayload(imagePayload);
-        imageData.setImageMetadata(imageMetadata);
+        const imageData = create(ImageDataSchema, {
+            payload: imagePayload,
+            imageMetadata: imageMetadata
+        });
 
-        const objectsRequest = new LensOverlayObjectsRequest();
-        objectsRequest.setRequestContext(requestContext);
-        objectsRequest.setImageData(imageData);
+        const objectsRequest = create(LensOverlayObjectsRequestSchema, {
+            requestContext: requestContext,
+            imageData: imageData
+        });
 
-        const serverRequest = new LensOverlayServerRequest();
-        serverRequest.setObjectsRequest(objectsRequest);
+        const serverRequest = create(LensOverlayServerRequestSchema, {
+            objectsRequest: objectsRequest
+        });
 
-        return serverRequest.serializeBinary();
+        return toBinary(LensOverlayServerRequestSchema, serverRequest);
     }
 
     #parseLensProtoResponse(serverResponseProto, originalImageDimensions) {
-        if (serverResponseProto.hasError()) {
-            const errorProto = serverResponseProto.getError();
-            const errorTypeName = Object.keys(LensOverlayServerErrorErrorType).find(key => LensOverlayServerErrorErrorType[key] === errorProto.getErrorType());
-            console.warn(`Lens server returned error: Type=${errorProto.getErrorType()} (${errorTypeName})`);
-            if (errorProto.getErrorType() !== LensOverlayServerErrorErrorType.UNKNOWN_TYPE) {
-                 return new LensResult('', []);
+        if (serverResponseProto.error !== undefined) {
+            const errorProto = serverResponseProto.error;
+            const errorTypeName = Object.keys(LensOverlayServerErrorErrorType).find(key => LensOverlayServerError_ErrorType[key] === errorProto.errorType);
+            console.warn(`Lens server returned error: Type=${errorProto.errorType} (${errorTypeName})`);
+            if (errorProto.errorType !== LensOverlayServerError_ErrorType.UNKNOWN_TYPE) {
+                return new LensResult('', []);
             }
         }
 
-        if (!serverResponseProto.hasObjectsResponse()) {
+        if (serverResponseProto.objectsResponse === undefined) {
             return new LensResult('', []);
         }
-        const objectsResponse = serverResponseProto.getObjectsResponse();
+        const objectsResponse = serverResponseProto.objectsResponse;
 
-        if (!objectsResponse.hasText() || !objectsResponse.getText().hasTextLayout()) {
+        if (objectsResponse.text?.textLayout === undefined) {
             return new LensResult('', []);
         }
 
-        const textProto = objectsResponse.getText();
-        const textLayout = textProto.getTextLayout();
-        const detectedLanguage = textProto.getContentLanguage() || (textLayout.getParagraphsList()[0]?.getContentLanguage()) || '';
+        const textProto = objectsResponse.text;
+        const textLayout = textProto.textLayout;
+        const detectedLanguage = textProto.contentLanguage || textLayout.paragraphss?.[0]?.contentLanguage || '';
 
         const segments = [];
 
-        for (const paragraph of textLayout.getParagraphsList()) {
-            for (const line of paragraph.getLinesList()) {
+        for (const paragraph of textLayout.paragraphs) {
+            for (const line of paragraph.lines) {
                 let lineTextContent = '';
-                const wordsList = line.getWordsList();
+                const wordsList = line.words;
                 for (let i = 0; i < wordsList.length; i++) {
                     const word = wordsList[i];
-                    lineTextContent += word.getPlainText();
-                    if (word.hasTextSeparator()) {
-                         lineTextContent += word.getTextSeparator();
+                    lineTextContent += word.plainText;
+                    if (word.textSeparator !== undefined) {
+                        lineTextContent += word.textSeparator;
                     } else if (i < wordsList.length -1) {
                         lineTextContent += ' ';
                     }
@@ -212,26 +225,26 @@ export default class LensCore {
 
                 if (lineTextContent) {
                     let boundingBox = null;
-                    if (line.hasGeometry() && line.getGeometry().hasBoundingBox()) {
-                        const protoGeoBox = line.getGeometry().getBoundingBox();
-                        if (protoGeoBox.getCoordinateType() === CoordinateType.NORMALIZED) {
-                             const boxData = [
-                                protoGeoBox.getCenterX(),
-                                protoGeoBox.getCenterY(),
-                                protoGeoBox.getWidth(),
-                                protoGeoBox.getHeight()
+                    if (line.geometry?.boundingBox !== undefined) {
+                        const protoGeoBox = line.geometry.boundingBox;
+                        if (protoGeoBox.coordinateType === CoordinateType.NORMALIZED) {
+                            const boxData = [
+                                protoGeoBox.centerX,
+                                protoGeoBox.centerY,
+                                protoGeoBox.width,
+                                protoGeoBox.height
                             ];
                             boundingBox = new BoundingBox(boxData, originalImageDimensions);
                         }
                     }
-                    if (!boundingBox && paragraph.hasGeometry() && paragraph.getGeometry().hasBoundingBox()) {
-                         const protoGeoBox = paragraph.getGeometry().getBoundingBox();
-                         if (protoGeoBox.getCoordinateType() === CoordinateType.NORMALIZED) {
+                    if (!boundingBox && paragraph.geometry?.boundingBox !== undefined) {
+                        const protoGeoBox = paragraph.geometry.boundingBox;
+                        if (protoGeoBox.coordinateType === CoordinateType.NORMALIZED) {
                             const boxData = [
-                                protoGeoBox.getCenterX(),
-                                protoGeoBox.getCenterY(),
-                                protoGeoBox.getWidth(),
-                                protoGeoBox.getHeight()
+                                protoGeoBox.centerX,
+                                protoGeoBox.centerY,
+                                protoGeoBox.width,
+                                protoGeoBox.height
                             ];
                             boundingBox = new BoundingBox(boxData, originalImageDimensions);
                         }
@@ -280,7 +293,7 @@ export default class LensCore {
 
         const responseArrayBuffer = await response.arrayBuffer();
         const responseUint8Array = new Uint8Array(responseArrayBuffer);
-        return LensOverlayServerResponse.deserializeBinary(responseUint8Array);
+        return fromBinary(LensOverlayServerResponseSchema, responseUint8Array);
     }
 
     async scanByURL(url) {

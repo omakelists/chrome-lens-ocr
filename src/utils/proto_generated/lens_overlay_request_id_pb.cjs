@@ -21,7 +21,7 @@ var global = (function() {
   return Function('return this')();
 }.call(null));
 
-var lens_overlay_routing_info_pb = require('./lens_overlay_routing_info_pb.js');
+var lens_overlay_routing_info_pb = require('./lens_overlay_routing_info_pb.cjs');
 goog.object.extend(proto, lens_overlay_routing_info_pb);
 goog.exportSymbol('proto.lens.LensOverlayRequestId', null, global);
 /**

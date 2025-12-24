@@ -21,9 +21,9 @@ var global = (function() {
   return Function('return this')();
 }.call(null));
 
-var lens_overlay_geometry_pb = require('./lens_overlay_geometry_pb.js');
+var lens_overlay_geometry_pb = require('./lens_overlay_geometry_pb.cjs');
 goog.object.extend(proto, lens_overlay_geometry_pb);
-var lens_overlay_text_query_pb = require('./lens_overlay_text_query_pb.js');
+var lens_overlay_text_query_pb = require('./lens_overlay_text_query_pb.cjs');
 goog.object.extend(proto, lens_overlay_text_query_pb);
 goog.exportSymbol('proto.lens.LensOverlayInteractionRequestMetadata', null, global);
 goog.exportSymbol('proto.lens.LensOverlayInteractionRequestMetadata.QueryMetadata', null, global);

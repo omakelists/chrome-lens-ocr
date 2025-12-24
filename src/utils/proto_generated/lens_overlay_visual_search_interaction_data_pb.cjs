@@ -21,11 +21,11 @@ var global = (function() {
   return Function('return this')();
 }.call(null));
 
-var lens_overlay_geometry_pb = require('./lens_overlay_geometry_pb.js');
+var lens_overlay_geometry_pb = require('./lens_overlay_geometry_pb.cjs');
 goog.object.extend(proto, lens_overlay_geometry_pb);
-var lens_overlay_interaction_request_metadata_pb = require('./lens_overlay_interaction_request_metadata_pb.js');
+var lens_overlay_interaction_request_metadata_pb = require('./lens_overlay_interaction_request_metadata_pb.cjs');
 goog.object.extend(proto, lens_overlay_interaction_request_metadata_pb);
-var lens_overlay_visual_search_interaction_log_data_pb = require('./lens_overlay_visual_search_interaction_log_data_pb.js');
+var lens_overlay_visual_search_interaction_log_data_pb = require('./lens_overlay_visual_search_interaction_log_data_pb.cjs');
 goog.object.extend(proto, lens_overlay_visual_search_interaction_log_data_pb);
 goog.exportSymbol('proto.lens.LensOverlayVisualSearchInteractionData', null, global);
 /**

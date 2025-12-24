@@ -21,7 +21,7 @@ var global = (function() {
   return Function('return this')();
 }.call(null));
 
-var lens_overlay_polygon_pb = require('./lens_overlay_polygon_pb.js');
+var lens_overlay_polygon_pb = require('./lens_overlay_polygon_pb.cjs');
 goog.object.extend(proto, lens_overlay_polygon_pb);
 goog.exportSymbol('proto.lens.CenterRotatedBox', null, global);
 goog.exportSymbol('proto.lens.Geometry', null, global);

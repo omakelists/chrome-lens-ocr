@@ -5,16 +5,10 @@ import { LENS_PROTO_ENDPOINT, LENS_API_KEY, MIME_TO_EXT, EXT_TO_MIME, SUPPORTED_
 
 import { parseCookies, sleep } from './utils.js';
 
-import { LensOverlayServerRequestSchema, LensOverlayServerResponseSchema, LensOverlayServerErrorSchema, LensOverlayServerError_ErrorType } from './utils/proto_generated/lens_overlay_server_pb.js';
-import { LensOverlayObjectsRequestSchema, LensOverlayRequestContextSchema } from "./utils/proto_generated/lens_overlay_service_deps_pb.js";
-import { LensOverlayClientContextSchema, LocaleContextSchema, ClientLoggingDataSchema } from './utils/proto_generated/lens_overlay_client_context_pb.js';
+import { LensOverlayServerRequestSchema, LensOverlayServerResponseSchema, LensOverlayServerError_ErrorType } from './utils/proto_generated/lens_overlay_server_pb.js';
 import { Platform } from "./utils/proto_generated/lens_overlay_platform_pb.js";
 import { Surface } from "./utils/proto_generated/lens_overlay_surface_pb.js";
-import { ImageDataSchema, ImagePayloadSchema, ImageMetadataSchema } from './utils/proto_generated/lens_overlay_image_data_pb.js';
-import { LensOverlayRequestIdSchema } from './utils/proto_generated/lens_overlay_request_id_pb.js';
-import { AppliedFilterSchema, AppliedFiltersSchema, LensOverlayFilterType } from './utils/proto_generated/lens_overlay_filters_pb.js';
-import { TextSchema, TextLayoutSchema, TextLayout_ParagraphSchema, TextLayout_LineSchema, TextLayout_WordSchema, WritingDirection, Alignment } from './utils/proto_generated/lens_overlay_text_pb.js';
-import { GeometrySchema, CenterRotatedBoxSchema } from './utils/proto_generated/lens_overlay_geometry_pb.js';
+import { LensOverlayFilterType } from './utils/proto_generated/lens_overlay_filters_pb.js';
 import { CoordinateType } from "./utils/proto_generated/lens_overlay_polygon_pb.js";
 
 
@@ -124,60 +118,36 @@ export default class LensCore {
     }
 
     #createLensProtoRequest(imageBytesUint8Array, width, height) {
-        const targetLanguage = this.#config.targetLanguage;
-
-        const requestId = create(LensOverlayRequestIdSchema, {
-            uuid: String(Date.now()) + String(Math.floor(Math.random() * 1000000)),
-            sequenceId: 1,
-            imageSequenceId: 1
-        });
-
-        const localeContext = create(LocaleContextSchema, {
-            language: targetLanguage,
-            region: this.#config.region || 'US',
-            timeZone: this.#config.timeZone || 'America/New_York'
-        });
-
-        const appliedFilter = create(AppliedFilterSchema, {
-            filterType: LensOverlayFilterType.AUTO_FILTER
-        });
-        const clientFilters = create(AppliedFiltersSchema, {
-            filter: appliedFilter
-        });
-
-        const clientContext = create(LensOverlayClientContextSchema, {
-            platform: Platform.PLATFORM_WEB,
-            surface: Surface.SURFACE_CHROMIUM,
-            localeContext: localeContext,
-            clientFilters: clientFilters
-        });
-
-        const requestContext = create(LensOverlayRequestContextSchema, {
-            requestId: requestId,
-            clientContext: clientContext
-        });
-
-        const imageMetadata = create(ImageMetadataSchema, {
-            width: width,
-            height: height
-        });
-
-        const imagePayload = create(ImagePayloadSchema, {
-            imageBytes: imageBytesUint8Array
-        });
-
-        const imageData = create(ImageDataSchema, {
-            payload: imagePayload,
-            imageMetadata: imageMetadata
-        });
-
-        const objectsRequest = create(LensOverlayObjectsRequestSchema, {
-            requestContext: requestContext,
-            imageData: imageData
-        });
-
         const serverRequest = create(LensOverlayServerRequestSchema, {
-            objectsRequest: objectsRequest
+            objectsRequest: {
+                requestContext: {
+                    requestId: {
+                        uuid: String(Date.now()) + String(Math.floor(Math.random() * 1000000)),
+                        sequenceId: 1,
+                        imageSequenceId: 1
+                    },
+                    clientContext: {
+                        platform: Platform.PLATFORM_WEB,
+                        surface: Surface.SURFACE_CHROMIUM,
+                        localeContext: {
+                            language: this.#config.targetLanguage,
+                            region: this.#config.region || 'US',
+                            timeZone: this.#config.timeZone || 'America/New_York'
+                        },
+                        clientFilters: {
+                            filter: {
+                                filterType: LensOverlayFilterType.AUTO_FILTER
+                            }
+                        }
+                    }
+                },
+                imageData: {
+                    payload: {
+                        imageBytes: imageBytesUint8Array
+                    },
+                    imageMetadata: { width, height }
+                }
+            }
         });
 
         return toBinary(LensOverlayServerRequestSchema, serverRequest);
